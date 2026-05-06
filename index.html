@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — Rédaction notariale ISaDroit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+.topbar { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+.topbar-title { font-size: 15px; font-weight: 500; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+.section { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+.section-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; }
+.field { margin-bottom: 0.875rem; }
+.field label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+.field input, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; }
+.field input:focus, .field textarea:focus { outline: none; border-color: #555; }
+.field textarea { height: 90px; resize: vertical; font-family: 'Courier New', monospace; font-size: 11px; }
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #1a1a1a; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: #f5f5f3; }
+.btn-primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.btn-primary:hover { background: #333; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-green { background: #f0faf0; color: #2d6a2d; border-color: #b8ddb8; }
+.msg { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-top: 10px; }
+.msg-error { background: #fff0f0; color: #c0392b; border: 1px solid #f5c0c0; }
+.msg-success { background: #f0faf0; color: #2d6a2d; border: 1px solid #b8ddb8; }
+.msg-warning { background: #fffbf0; color: #856404; border: 1px solid #ffd966; }
+.msg-info { background: #f0f5ff; color: #1a4a8a; border: 1px solid #b8ccf5; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+.stat-card { background: #f9f9f8; border-radius: 8px; padding: 0.875rem 1rem; }
+.stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+.stat-value { font-size: 24px; font-weight: 500; }
+.stat-orange { color: #c47d0e; }
+.stat-green { color: #2d6a2d; }
+.stat-gray { color: #666; }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.filter-bar select { font-size: 13px; padding: 6px 10px; border: 1px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; }
+.filter-count { font-size: 12px; color: #888; margin-left: auto; }
+.dossier-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+.dossier-card:hover { border-color: #ccc; }
+.dossier-card.redige { border-left: 3px solid #4caf50; }
+.dossier-card.a-rediger { border-left: 3px solid #f0a500; }
+.dossier-card.manuel { border-left: 3px solid #999; }
+.dossier-name { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.dossier-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.meta-item { font-size: 12px; color: #666; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 6px; }
+.badge-orange { background: #fff3cd; color: #856404; }
+.badge-green { background: #d4edda; color: #155724; }
+.badge-gray { background: #f0f0ee; color: #555; }
+.badge-blue { background: #cce5ff; color: #004085; }
+.dossier-alerts { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.dossier-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0ee; flex-wrap: wrap; align-items: center; }
+.cognito-data { background: #f9f9f8; border-radius: 8px; padding: 1rem; margin-top: 10px; }
+.cognito-data h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.cognito-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cf-label { font-size: 11px; color: #888; margin-bottom: 2px; }
+.cf-value { font-size: 13px; font-weight: 500; }
+.checklist-section { background: #f9f9f8; border-radius: 8px; padding: 1rem; margin-top: 10px; }
+.checklist-section h4 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.checklist-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0ee; font-size: 13px; }
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item input[type=checkbox] { margin-top: 2px; cursor: pointer; }
+.checklist-item label { cursor: pointer; line-height: 1.4; }
+.checklist-item input:checked + label { text-decoration: line-through; color: #aaa; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
+.loading { text-align: center; padding: 2rem; color: #888; font-size: 14px; }
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #ddd; border-top-color: #555; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.saved-badge { font-size: 11px; color: #2d6a2d; display: none; margin-left: 8px; }
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .row-2 { grid-template-columns: 1fr; }
+  .cognito-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-title">⚖️ Rédaction notariale — ISaDroit</div>
+  <div class="topbar-actions">
+    <span id="config-status" style="font-size:12px;color:#888;"></span>
+    <button class="btn btn-sm" onclick="toggleConfig()">⚙️ Configuration</button>
+    <button class="btn btn-sm btn-primary" onclick="loadDossiers()">↻ Actualiser</button>
+  </div>
+</div>
+<div class="container">
+  <div class="section" id="config-section">
+    <div class="section-title">⚙️ Configuration — clés API</div>
+    <div class="field">
+      <label>Clé API Cognito</label>
+      <input type="password" id="cognito-key" placeholder="Collez votre clé API Cognito ici" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>Contenu du fichier JSON Google (compte de service)</label>
+      <textarea id="google-json" placeholder='{"type": "service_account", "project_id": "...", "private_key": "...", ...}'></textarea>
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label>ID Google Sheets</label>
+        <input type="text" id="sheet-id" placeholder="1uf5J5m6V96S9VptnC7ZuB50XouAhRNJpKoDSNGqPIHw" />
+      </div>
+      <div class="field">
+        <label>Nom de l'onglet</label>
+        <input type="text" id="sheet-tab" value="Rédaction" />
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveConfig()">💾 Sauvegarder</button>
+      <span class="saved-badge" id="saved-badge">✓ Sauvegardé</span>
+    </div>
+    <div id="config-msg"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📋 Dossiers à rédiger</div>
+    <div id="dashboard-content">
+      <div class="empty-state">Configurez vos clés API ci-dessus et cliquez sur Sauvegarder pour charger les dossiers.</div>
+    </div>
+  </div>
+</div>
+<script>
+const COGNITO_ORG='DroitLegal2';
+const FORM_SLUGS={'A2026':'A2026QUESTIONNAIREFORFAITCOMPLETPERSONNE1','B2026':'B2026QUESTIONNAIREFORFAITCOMPLETPERSONNE2','A2024':'A2024QUESTIONNAIREFORFAITCOMPLETPERSONNE1','B2024':'B2024QUESTIONNAIREFORFAITCOMPLETPERSONNE2'};
+const CHECKLIST=["Vérifier que l'en-tête du dossier est à jour ainsi que la facturation","Vérifier, s'il y a une modif au forfait, que le tout a été confirmé avec le client","Uniformiser les titres des documents selon la nouvelle méthode","Vérifier que les IDs et preuve d'état civil sont lisibles et à jour","Vérifier que le NAM est bel et bien écrit dans la fiche client","S'il y a clauses non standard, vérifier le français et se relire","En cas de doute sur une clause non-standard, faire vérifier par le notaire","Mettre les actes dans PM","Mettre toutes les pièces jointes avec les bons titres dans PM","Mettre les notes à jour dans PM et libérer","Vérifier et modifier le titre du dossier selon le bon modèle","Dans PM, vérifier que le dossier est attribué au bon notaire"];
+let config={},dossiers=[],filterNotaire='tous',filterEtat='tous',configVisible=true,checklistState={};
+
+function toggleConfig(){configVisible=!configVisible;document.getElementById('config-section').style.display=configVisible?'block':'none';}
+
+function saveConfig(){
+  const ck=document.getElementById('cognito-key').value.trim();
+  const gj=document.getElementById('google-json').value.trim();
+  const si=document.getElementById('sheet-id').value.trim();
+  const st=document.getElementById('sheet-tab').value.trim();
+  const msg=document.getElementById('config-msg');
+  if(!ck||!gj||!si||!st){msg.innerHTML='<div class="msg msg-error">⚠️ Veuillez remplir tous les champs.</div>';return;}
+  try{JSON.parse(gj);}catch(e){msg.innerHTML='<div class="msg msg-error">⚠️ Le JSON Google est invalide.</div>';return;}
+  config={cognitoKey:ck,googleJson:gj,sheetId:si,sheetTab:st};
+  localStorage.setItem('redaction_config',JSON.stringify(config));
+  document.getElementById('saved-badge').style.display='inline';
+  document.getElementById('config-status').textContent='✓ Configuré';
+  msg.innerHTML='<div class="msg msg-success">✓ Sauvegardé. Chargement des dossiers...</div>';
+  setTimeout(()=>{configVisible=false;document.getElementById('config-section').style.display='none';loadDossiers();},900);
+}
+
+async function getGoogleToken(saj){
+  const sa=JSON.parse(saj);
+  const now=Math.floor(Date.now()/1000);
+  const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const unsigned=b64u({alg:'RS256',typ:'JWT'})+'.'+b64u({iss:sa.client_email,scope:'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly',aud:'https://oauth2.googleapis.com/token',exp:now+3600,iat:now});
+  const bk=Uint8Array.from(atob(sa.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g,'')),c=>c.charCodeAt(0));
+  const ck=await crypto.subtle.importKey('pkcs8',bk.buffer,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['sign']);
+  const sig=await crypto.subtle.sign('RSASSA-PKCS1-v1_5',ck,new TextEncoder().encode(unsigned));
+  const jwt=unsigned+'.'+btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`});
+  const d=await r.json();
+  if(!d.access_token)throw new Error('Token invalide: '+JSON.stringify(d));
+  return d.access_token;
+}
+
+async function loadDossiers(){
+  const c=document.getElementById('dashboard-content');
+  c.innerHTML='<div class="loading"><span class="spinner"></span>Chargement depuis Google Sheets...</div>';
+  try{
+    const token=await getGoogleToken(config.googleJson);
+    const range=encodeURIComponent(config.sheetTab+'!A:K');
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${config.sheetId}/values/${range}`,{headers:{Authorization:`Bearer ${token}`}});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    if(!d.values||d.values.length<2){c.innerHTML='<div class="msg msg-warning">⚠️ Aucune donnée. Vérifiez le nom de l\'onglet.</div>';return;}
+    dossiers=d.values.slice(1).filter(r=>r.some(c=>c&&c.trim())).map((row,i)=>({idx:i+2,dateRdv:row[0]||'',nom:row[1]||'',notaire:row[2]||'',typeActes:row[3]||'',typeDossier:row[4]||'',cognitoP1:(row[5]||'').trim(),cognitoP2:(row[6]||'').trim(),lienDrive:row[7]||'',technicien:row[8]||'',etat:row[9]||'Dossier à rédiger',precisions:row[10]||'',cognitoData:null,showChecklist:false}));
+    renderDashboard();
+  }catch(e){c.innerHTML=`<div class="msg msg-error">❌ Erreur Google Sheets: ${e.message}</div>`;}
+}
+
+function parseRef(ref){if(!ref)return null;const m=ref.replace(/\s/g,'').match(/^([AB]20\d{2})-?(\d+)$/i);return m?{form:m[1].toUpperCase(),entryId:m[2]}:null;}
+
+function getAlerts(d){
+  const al=[],p=( d.precisions||'').toLowerCase();
+  if(p.includes('a rempli a2026 au lieu')||p.includes('mauvais formulaire'))al.push({t:'warning',msg:'⚠️ P2 a rempli le mauvais formulaire — vérification manuelle'});
+  const p1=parseRef(d.cognitoP1),p2=parseRef(d.cognitoP2);
+  if(p1&&p1.form.includes('2024'))al.push({t:'warning',msg:'⚠️ Formulaire 2024 (ancienne version) pour P1'});
+  if(p2&&p2.form.includes('2024'))al.push({t:'warning',msg:'⚠️ Formulaire 2024 (ancienne version) pour P2'});
+  if(d.typeActes==='Autre')al.push({t:'info',msg:'ℹ️ Rédaction manuelle — hors automatisation'});
+  if(d.precisions&&d.precisions.trim()&&!p.includes('a rempli'))al.push({t:'info',msg:'📝 '+d.precisions});
+  return al;
+}
+
+function etatBadge(e){
+  if(!e||e==='Dossier à rédiger')return '<span class="badge badge-orange">🟠 À rédiger</span>';
+  if(e==='Rédigé')return '<span class="badge badge-green">✓ Rédigé</span>';
+  return '<span class="badge badge-gray">👤 Manuel</span>';
+}
+
+function renderDashboard(){
+  const c=document.getElementById('dashboard-content');
+  const filtered=dossiers.filter(d=>{
+    if(filterNotaire!=='tous'&&d.notaire!==filterNotaire)return false;
+    if(filterEtat==='Dossier à rédiger'&&d.etat!=='Dossier à rédiger'&&d.etat!=='')return false;
+    if(filterEtat==='Rédigé'&&d.etat!=='Rédigé')return false;
+    return true;
+  });
+  const notaires=[...new Set(dossiers.map(d=>d.notaire).filter(Boolean))].sort();
+  const aR=dossiers.filter(d=>!d.etat||d.etat==='Dossier à rédiger').length;
+  const re=dossiers.filter(d=>d.etat==='Rédigé').length;
+  const ma=dossiers.filter(d=>d.typeActes==='Autre').length;
+  let html=`<div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${dossiers.length}</div></div>
+    <div class="stat-card"><div class="stat-label">À rédiger</div><div class="stat-value stat-orange">${aR}</div></div>
+    <div class="stat-card"><div class="stat-label">Rédigés</div><div class="stat-value stat-green">${re}</div></div>
+    <div class="stat-card"><div class="stat-label">Manuel</div><div class="stat-value stat-gray">${ma}</div></div>
+  </div>
+  <div class="filter-bar">
+    <select onchange="filterNotaire=this.value;renderDashboard()">
+      <option value="tous">Tous les notaires</option>
+      ${notaires.map(n=>`<option value="${n}" ${filterNotaire===n?'selected':''}>${n}</option>`).join('')}
+    </select>
+    <select onchange="filterEtat=this.value;renderDashboard()">
+      <option value="tous">Tous les états</option>
+      <option value="Dossier à rédiger" ${filterEtat==='Dossier à rédiger'?'selected':''}>À rédiger</option>
+      <option value="Rédigé" ${filterEtat==='Rédigé'?'selected':''}>Rédigés</option>
+    </select>
+    <span class="filter-count">${filtered.length} dossier${filtered.length!==1?'s':''}</span>
+  </div>`;
+
+  if(!filtered.length){html+='<div class="empty-state">Aucun dossier ne correspond aux filtres.</div>';}
+  else filtered.forEach(d=>{
+    const al=getAlerts(d);
+    const p1=parseRef(d.cognitoP1),p2=parseRef(d.cognitoP2);
+    const cu1=p1&&FORM_SLUGS[p1.form]?`https://www.cognitoforms.com/${COGNITO_ORG}/${FORM_SLUGS[p1.form]}/${p1.entryId}`:null;
+    const cu2=p2&&FORM_SLUGS[p2.form]?`https://www.cognitoforms.com/${COGNITO_ORG}/${FORM_SLUGS[p2.form]}/${p2.entryId}`:null;
+    const cl=d.etat==='Rédigé'?'redige':d.typeActes==='Autre'?'manuel':'a-rediger';
+    const ck=`ck_${d.idx}`;if(!checklistState[ck])checklistState[ck]={};
+    html+=`<div class="dossier-card ${cl}" id="card-${d.idx}">
+      <div class="dossier-name">${d.nom||'—'}</div>
+      <div class="dossier-meta">
+        ${d.dateRdv?`<span class="meta-item">📅 ${d.dateRdv}</span>`:''}
+        ${d.notaire?`<span class="meta-item">👤 ${d.notaire}</span>`:''}
+        ${d.typeDossier?`<span class="meta-item">📄 ${d.typeDossier}</span>`:''}
+        ${d.typeActes?`<span class="badge badge-blue">${d.typeActes}</span>`:''}
+        ${etatBadge(d.etat)}
+      </div>
+      ${al.length?`<div class="dossier-alerts">${al.map(a=>`<div class="msg msg-${a.t==='warning'?'warning':'info'}" style="padding:7px 12px;font-size:12px;margin-top:0;">${a.msg}</div>`).join('')}</div>`:''}
+      ${d.cognitoData?`<div class="cognito-data"><h4>Données Cognito</h4><div class="cognito-grid">${d.cognitoData.map(f=>`<div><div class="cf-label">${f.label}</div><div class="cf-value">${f.value||'—'}</div></div>`).join('')}</div></div>`:''}
+      <div class="dossier-actions">
+        ${d.lienDrive?`<a href="${d.lienDrive}" target="_blank"><button class="btn btn-sm">📁 Drive</button></a>`:''}
+        ${cu1?`<a href="${cu1}" target="_blank"><button class="btn btn-sm">📋 Cognito P1 (${d.cognitoP1})</button></a>`:''}
+        ${cu2?`<a href="${cu2}" target="_blank"><button class="btn btn-sm">📋 Cognito P2 (${d.cognitoP2})</button></a>`:''}
+        ${d.typeActes!=='Autre'&&p1?`<button class="btn btn-sm" onclick="chargerCognito(${d.idx})">⬇️ Charger Cognito</button>`:''}
+        <button class="btn btn-sm" onclick="toggleCL(${d.idx})">${d.showChecklist?'▲ Masquer':'✅ Checklist'}</button>
+        ${d.etat!=='Rédigé'?`<button class="btn btn-sm btn-green" style="margin-left:auto;" onclick="marquerRedige(${d.idx})">✓ Marquer rédigé</button>`:'<span style="margin-left:auto;font-size:12px;color:#2d6a2d;">✓ Rédigé</span>'}
+      </div>
+      ${d.showChecklist?`<div class="checklist-section"><h4>✅ Liste de révision finale</h4>${CHECKLIST.map((item,i)=>`<div class="checklist-item"><input type="checkbox" id="ck_${d.idx}_${i}" ${checklistState[ck][i]?'checked':''} onchange="toggleCheck(${d.idx},${i},this.checked)"><label for="ck_${d.idx}_${i}">${item}</label></div>`).join('')}</div>`:''}
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+function toggleCL(idx){const d=dossiers.find(x=>x.idx===idx);if(d){d.showChecklist=!d.showChecklist;renderDashboard();}}
+function toggleCheck(idx,i,v){const k=`ck_${idx}`;if(!checklistState[k])checklistState[k]={};checklistState[k][i]=v;}
+
+async function chargerCognito(idx){
+  const d=dossiers.find(x=>x.idx===idx);if(!d)return;
+  const p1=parseRef(d.cognitoP1);if(!p1){alert('Numéro Cognito P1 invalide.');return;}
+  const fs=FORM_SLUGS[p1.form];if(!fs){alert('Formulaire non reconnu: '+p1.form);return;}
+  try{
+    const r=await fetch(`https://www.cognitoforms.com/api/forms/${fs}/entries/${p1.entryId}`,{headers:{Authorization:`Bearer ${config.cognitoKey}`,'Content-Type':'application/json'}});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const e=await r.json();
+    const fields=[];
+    const add=(l,v)=>{if(v)fields.push({label:l,value:v});};
+    if(e.Name)add('Nom complet',`${e.Name.First||''} ${e.Name.Last||''}`.trim());
+    add('État civil',e.EtatCivil||e.StatutMatrimonial);
+    add('Date de naissance',e.DateNaissance||e.DateDeNaissance);
+    add('NAM (RAMQ)',e.NAM||e.Ramq||e.NumeroRAMQ);
+    add('Adresse',e.Adresse||e.Address);
+    if(!fields.length)Object.entries(e).slice(0,8).forEach(([k,v])=>{if(typeof v==='string'&&v.trim()&&!k.startsWith('_')&&k!=='Entry')add(k,v);});
+    d.cognitoData=fields;renderDashboard();
+  }catch(e){alert('Erreur Cognito: '+e.message);}
+}
+
+async function marquerRedige(idx){
+  const d=dossiers.find(x=>x.idx===idx);if(!d)return;
+  if(!confirm(`Marquer "${d.nom}" comme rédigé ?`))return;
+  try{
+    const token=await getGoogleToken(config.googleJson);
+    const range=encodeURIComponent(config.sheetTab+`!J${idx}`);
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${config.sheetId}/values/${range}?valueInputOption=RAW`,{method:'PUT',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({values:[['Rédigé']]})});
+    const data=await r.json();if(data.error)throw new Error(data.error.message);
+    d.etat='Rédigé';renderDashboard();
+  }catch(e){alert('Erreur mise à jour: '+e.message);}
+}
+
+const saved=localStorage.getItem('redaction_config');
+if(saved){try{config=JSON.parse(saved);document.getElementById('cognito-key').value=config.cognitoKey||'';document.getElementById('google-json').value=config.googleJson||'';document.getElementById('sheet-id').value=config.sheetId||'';document.getElementById('sheet-tab').value=config.sheetTab||'';document.getElementById('saved-badge').style.display='inline';document.getElementById('config-status').textContent='✓ Configuré';if(config.cognitoKey&&config.googleJson&&config.sheetId){configVisible=false;document.getElementById('config-section').style.display='none';loadDossiers();}}catch(e){}}
+</script>
+</body>
+</html>
